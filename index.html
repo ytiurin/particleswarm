@@ -1,0 +1,152 @@
+<!DOCTYPE><html><head><title>Particle swarm</title></head><body>
+
+<div id="container" style="position:fixed;left:0px;top:0px;width:100%;height:100%;background-image:url(./images/g7LogC3.png);background-size:contain;">
+  <div style="color:white;padding:12px;font-size:20px;position:absolute;z-index:1;">
+    <em>PARTICLE SWARM METHOD</em><br>
+    <a href="https://en.wikipedia.org/wiki/Particle_swarm_optimization" target="_blank">Algorithm description</a><br>
+    <button id="stop">Pause</button>
+    <div id="fps"></div>
+  </div>
+</div>
+
+<script src="./swarm.js"></script>
+
+<script>
+
+var container = document.getElementById('container');
+var containerRect = container.getBoundingClientRect();
+
+// CREATE SWARM
+var swarm = new Swarm;
+
+swarm.targetPosition = new Vector(
+  containerRect.width / 2,
+  containerRect.height / 2
+);
+
+swarm.boundingRect = [
+  new Vector,
+  new Vector(
+    containerRect.width,
+    containerRect.height
+  )
+]
+
+// CREATE PARTICLES
+var elements=[];
+
+var i = 100;
+
+var l = 1;
+
+var an = 0;
+
+while(i--)
+{
+  var style=document.createAttribute('style');
+
+  style.value = `
+position:absolute;
+left:0px;
+top:0px;
+width:80px;
+height:80px;
+background-image:url(./images/`+(l++)+`.png);
+background-position: 50% 50%;
+background-repeat: no-repeat;
+transition:transform .1s linear;
+`;
+
+  l = l>12 ? 1 : l;
+
+  var el = document.createElement("div");
+  el.attributes.setNamedItem(style);
+
+  el.addEventListener("animationend", function(){
+    console.log('KK')
+    if(++an===elements.length){
+      an=0;
+      nextFrame();
+    }
+  }, false);
+
+  container.appendChild(el);
+
+  elements.push(el);
+
+  swarm.addParticle(
+    new Particle(
+      new Vector(
+        Math.random()*containerRect.width,
+        Math.random()*containerRect.height
+      )
+    )
+  );
+}
+
+function nextFrame()
+{
+  if(mouseX&&mouseY)
+    swarm.targetPosition = new Vector(mouseX, mouseY)
+
+  swarm.next();
+
+  var particle, i=0;
+
+  while(particle = swarm.particles[i++])
+    elements[i-1].style.transform = "translate3d("+parseInt(particle.position.x-40)+"px,"+parseInt(particle.position.y-40)+"px,0)";
+}
+
+nextFrame();
+
+// CYCLE ANIMATION
+var intervalId = setInterval(nextFrame, 100);
+
+document.getElementById('stop').addEventListener('click',function(){
+  clearInterval(intervalId);
+});
+
+// MANAGE MOUSE MOVEMENTS AND CLICKS
+var mouseX=0,mouseY=0;
+
+document.body.addEventListener('mousemove',function(e){
+  mouseX = e.pageX;
+  mouseY = e.pageY;
+});
+
+document.body.addEventListener('mousedown',function(e){
+  swarm.particleBraking = 0.9;
+});
+
+document.body.addEventListener('mouseup',function(e){
+  swarm.particleBraking = 0.98;
+
+  var rect = container.getBoundingClientRect();
+  swarm.explode(rect.width,rect.height);
+});
+
+// COUNT FPS
+var fps = 0;
+var fpsEl = document.getElementById('fps');
+
+setInterval(function(){
+  fpsEl.innerHTML = fps+"FPS";
+
+  fps = 0;
+}, 1000);
+
+function catchNextFrame()
+{
+  requestAnimationFrame(function(){
+    fps++;
+
+    catchNextFrame();
+  });
+}
+
+catchNextFrame();
+
+</script>
+
+
+</body></html>
