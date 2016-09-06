@@ -123,7 +123,7 @@ container.addEventListener('mousemove',function(e){
 
 container.addEventListener('mousedown',function(e){
   e.preventDefault();
-  swarm.particleBraking = 0.97;
+  swarm.particleBraking = 0.99;
 });
 
 container.addEventListener('mouseup',function(e){
@@ -134,18 +134,20 @@ container.addEventListener('mouseup',function(e){
 
 container.addEventListener('touchmove',function(e){
   e.preventDefault();
-  mouseX = e.pageX;
-  mouseY = e.pageY;
+  mouseX = e.touches[0].clientX;
+  mouseY = e.touches[0].clientY;
 });
 
 container.addEventListener('touchstart',function(e){
   e.preventDefault();
-  // swarm.particleBraking = 0.97;
+  mouseX = e.touches[0].clientX;
+  mouseY = e.touches[0].clientY;
+  swarm.particleBraking = 0.99;
 });
 
 container.addEventListener('touchend',function(e){
   e.preventDefault();
-  // swarm.particleBraking = 0.997;
+  swarm.particleBraking = 0.997;
   swarm.explode(20);
 });
 
