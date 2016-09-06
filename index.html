@@ -1,19 +1,19 @@
 <!DOCTYPE><html><head><title>Particle swarm</title></head><body>
 
-<div id="container" style="position:fixed;left:0px;top:0px;width:100%;height:100%;background-image:url(./images/g7LogC3.png);background-size:contain;">
-  <div style="color:white;padding:12px;font-size:20px;position:absolute;z-index:1;">
-    <em>PARTICLE SWARM METHOD</em><br>
-    <a href="https://en.wikipedia.org/wiki/Particle_swarm_optimization" target="_blank">Algorithm description</a><br>
-    <button id="stop">Pause</button>
-    <div id="fps"></div>
-  </div>
+<div id="particle-container" style="position:fixed;left:0px;top:0px;width:100%;height:100%;background-image:url(./images/g7LogC3.png);background-size:contain;"></div>
+
+<div style="color:white;padding:12px;font-size:20px;position:fixed;">
+  <em>PARTICLE SWARM METHOD</em><br>
+  <a href="https://en.wikipedia.org/wiki/Particle_swarm_optimization" target="_blank">Algorithm description</a><br>
+  <button id="stop">Pause</button>
+  <div id="fps"></div>
 </div>
 
 <script src="./swarm.js"></script>
 
 <script>
 
-var container = document.getElementById('container');
+var container = document.getElementById('particle-container');
 var containerRect = container.getBoundingClientRect();
 
 // CREATE SWARM
@@ -24,13 +24,16 @@ swarm.targetPosition = new Vector(
   containerRect.height / 2
 );
 
+swarm.particleBraking = 0.997;
+swarm.maxSpeed = 50;
+
 swarm.boundingRect = [
   new Vector,
   new Vector(
     containerRect.width,
     containerRect.height
   )
-]
+];
 
 // CREATE PARTICLES
 var elements=[];
@@ -54,7 +57,6 @@ height:80px;
 background-image:url(./images/`+(l++)+`.png);
 background-position: 50% 50%;
 background-repeat: no-repeat;
-// transition:transform .1s linear;
 `;
 
   l = l>12 ? 1 : l;
@@ -84,25 +86,27 @@ background-repeat: no-repeat;
   );
 }
 
-function nextFrame()
+function drawNextFrame()
 {
+  requestAnimationFrame(function(){
+    var particle, i=0;
+
+    while(particle = swarm.particles[i++])
+      elements[i-1].style.transform = "translate3d("+parseInt(particle.position.x-40)+"px,"+parseInt(particle.position.y-40)+"px,0)";
+
+    drawNextFrame();
+  });
+}
+
+drawNextFrame();
+
+// CYCLE ANIMATION
+var intervalId = setInterval(function(){
   if(mouseX&&mouseY)
     swarm.targetPosition = new Vector(mouseX, mouseY)
 
   swarm.next();
-
-  var particle, i=0;
-
-  while(particle = swarm.particles[i++])
-    elements[i-1].style.transform = "translate3d("+parseInt(particle.position.x-40)+"px,"+parseInt(particle.position.y-40)+"px,0)";
-}
-
-nextFrame();
-
-// CYCLE ANIMATION
-var intervalId = setInterval(function(){
-  requestAnimationFrame(nextFrame);
-}, 17);
+}, 16);
 
 document.getElementById('stop').addEventListener('click',function(){
   clearInterval(intervalId);
@@ -111,20 +115,38 @@ document.getElementById('stop').addEventListener('click',function(){
 // MANAGE MOUSE MOVEMENTS AND CLICKS
 var mouseX=0,mouseY=0;
 
-document.body.addEventListener('mousemove',function(e){
+container.addEventListener('mousemove',function(e){
+  e.preventDefault();
   mouseX = e.pageX;
   mouseY = e.pageY;
 });
 
-document.body.addEventListener('mousedown',function(e){
-  swarm.particleBraking = 0.9;
+container.addEventListener('mousedown',function(e){
+  e.preventDefault();
+  swarm.particleBraking = 0.97;
 });
 
-document.body.addEventListener('mouseup',function(e){
-  swarm.particleBraking = 0.98;
+container.addEventListener('mouseup',function(e){
+  e.preventDefault();
+  swarm.particleBraking = 0.997;
+  swarm.explode(20);
+});
 
-  var rect = container.getBoundingClientRect();
-  swarm.explode(rect.width,rect.height);
+container.addEventListener('touchmove',function(e){
+  e.preventDefault();
+  mouseX = e.pageX;
+  mouseY = e.pageY;
+});
+
+container.addEventListener('touchstart',function(e){
+  e.preventDefault();
+  // swarm.particleBraking = 0.97;
+});
+
+container.addEventListener('touchend',function(e){
+  e.preventDefault();
+  // swarm.particleBraking = 0.997;
+  swarm.explode(20);
 });
 
 // COUNT FPS

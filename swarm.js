@@ -61,7 +61,9 @@ function Particle(initPosition)
   this.globalBestPosition = new Vector;
   this.localBestPosition = this.position;
 
-  this.braking = 0.97;
+  this.braking = 1;
+
+  this.maxSpeed;
 
   this.boundingRect;
 
@@ -111,12 +113,12 @@ function Particle(initPosition)
       }
     }
 
-    if(distance(new Vector, velocity)>100)
-      velocity = newVectorLength(velocity, 100);
+    if(this.maxSpeed && distance(new Vector, velocity)>50)
+      velocity = newVectorLength(velocity, 50);
   }
 
-  this.moveAway = function(from){
-    velocity = newVectorLength(finalVector(this.position,from), 200);
+  this.moveAway = function(from, distance){
+    velocity = newVectorLength(finalVector(this.position,from), distance);
   }
 }
 
@@ -125,6 +127,8 @@ function Swarm()
   this.particles = [];
 
   this.particleBraking = 1;
+
+  this.maxSpeed;
 
   this.targetPosition = new Vector;
 
@@ -136,12 +140,11 @@ function Swarm()
     this.particles.push(particle);
   }
 
-  this.explode=function(boundX, boundY){
+  this.explode=function(distance){
     var particle, i=0;
 
-    while(particle = this.particles[i++]){
-      particle.moveAway(this.targetPosition);
-    }
+    while(particle = this.particles[i++])
+      particle.moveAway(this.targetPosition, distance);
   }
 
   this.next=function(){
@@ -160,6 +163,7 @@ function Swarm()
     while(particle = this.particles[i++]){
       particle.globalBestPosition = globalBestPosition;
       particle.braking = this.particleBraking;
+      particle.maxSpeed = this.maxSpeed;
       particle.boundingRect = this.boundingRect;
 
       particle.next();
