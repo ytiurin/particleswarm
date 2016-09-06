@@ -54,7 +54,7 @@ height:80px;
 background-image:url(./images/`+(l++)+`.png);
 background-position: 50% 50%;
 background-repeat: no-repeat;
-transition:transform .1s linear;
+// transition:transform .1s linear;
 `;
 
   l = l>12 ? 1 : l;
@@ -100,7 +100,9 @@ function nextFrame()
 nextFrame();
 
 // CYCLE ANIMATION
-var intervalId = setInterval(nextFrame, 100);
+var intervalId = setInterval(function(){
+  requestAnimationFrame(nextFrame);
+}, 17);
 
 document.getElementById('stop').addEventListener('click',function(){
   clearInterval(intervalId);

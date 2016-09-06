@@ -65,8 +65,8 @@ function Particle(initPosition)
 
   this.boundingRect;
 
-  var localWeight = 0.1;
-  var globalWeight = 0.1;
+  var localWeight = 0.001;
+  var globalWeight = 0.001;
 
   var velocity = new Vector;
 
