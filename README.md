@@ -6,6 +6,9 @@ Particle swarm optimization method, animated in DOM w/GPU acceleration.
 
 [Demo page](https://ytiurin.github.io/particleswarm/) is mobile friendly.
 
+## Definition
+Particle swarm is an optimization method that iteratively improves a candidate solution with regard to a given measure of quality. Check the Wikipedia [page](https://en.wikipedia.org/wiki/Particle_swarm_optimization) for algorithm description.
+
 ## Usage
 This code defines a particle swarm object, containing 10 particles with random position. 
 
@@ -36,9 +39,6 @@ setInterval(function(){
   swarm.next()
 }, 16);
 ```
-
-## Definition
-Particle swarm is an optimization method that iteratively improves a candidate solution with regard to a given measure of quality. Check the Wikipedia [page](https://en.wikipedia.org/wiki/Particle_swarm_optimization) for algorithm description.
 
 ## GPU acceleration
 Animated elements are transformed using CSS `translate3d`/`rotate3d` properties, which is GPU accelerated in majority of modern browsers.
