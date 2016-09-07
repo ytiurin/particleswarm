@@ -1,12 +1,18 @@
 <!DOCTYPE><html><head><title>Particle swarm</title></head><body>
 
-<div id="particle-container" style="position:fixed;left:0px;top:0px;width:100%;height:100%;background-image:url(./images/g7LogC3.png);background-size:contain;"></div>
+<div id="particle-container" style="position:fixed;left:0px;top:0px;width:100%;height:100%;background-image:url(./images/g7LogC3.png);background-size:contain;background-color:peru;"></div>
 
-<div style="color:white;padding:12px;font-size:20px;position:fixed;">
-  <em>PARTICLE SWARM METHOD</em><br>
-  <a href="https://en.wikipedia.org/wiki/Particle_swarm_optimization" target="_blank">Algorithm description</a><br>
-  <button id="stop">Pause</button>
-  <div id="fps"></div>
+<div style="color:white;padding:12px;font-size:16px;font-style:italic;position:fixed;background-color:rgba(0,0,0,.3);">
+  <h3>PARTICLE SWARM METHOD</h3>
+  <h4>ANIMATED IN DOM W/ GPU ACCELERATION</h4>
+  <p>Check the Wikipedia <a href="https://en.wikipedia.org/wiki/Particle_swarm_optimization" target="_blank">page</a> for the algorithm description</p>
+  <p><label for="count">Particles count</label> <input id="count" type="number" value="100" inputmode="numeric" min="0" style="width:60px;" /></p>
+  <p>
+    <button id="stop">Pause</button>
+    <button id="shuffle">Shuffle</button>
+  </p>
+  <p id="fps">0FPS</p>
+  <p><a href="https://github.com/ytiurin/particleswarm" target="_blank">Fork</a> on Github</p>
 </div>
 
 <script src="./swarm.js"></script>
@@ -44,7 +50,7 @@ var l = 1;
 
 var an = 0;
 
-while(i--)
+function addParticle()
 {
   var style=document.createAttribute('style');
 
@@ -64,14 +70,6 @@ background-repeat: no-repeat;
   var el = document.createElement("div");
   el.attributes.setNamedItem(style);
 
-  el.addEventListener("animationend", function(){
-    console.log('KK')
-    if(++an===elements.length){
-      an=0;
-      nextFrame();
-    }
-  }, false);
-
   container.appendChild(el);
 
   elements.push(el);
@@ -86,70 +84,108 @@ background-repeat: no-repeat;
   );
 }
 
+while(i--)
+  addParticle();
+
+// DRAW ANIMATION
+var pauseAnimation=false;
+
 function drawNextFrame()
 {
   requestAnimationFrame(function(){
-    var particle, i=0;
-
+    var particle, i=0, rotateAngle;
     while(particle = swarm.particles[i++])
-      elements[i-1].style.transform = "translate3d("+parseInt(particle.position.x-40)+"px,"+parseInt(particle.position.y-40)+"px,0)";
+      elements[i-1].style.transform = "translate3d("+parseInt(particle.position.x-40)+"px,"+parseInt(particle.position.y-40)+"px,0) rotate3d(0,0,1,"+particle.angle+"rad)";
 
-    drawNextFrame();
+    fps++;
+
+    !pauseAnimation&&
+      drawNextFrame();
   });
 }
 
 drawNextFrame();
 
-// CYCLE ANIMATION
-var intervalId = setInterval(function(){
-  if(mouseX&&mouseY)
-    swarm.targetPosition = new Vector(mouseX, mouseY)
+// LOOP ANIMATION
+var intervalId;
 
-  swarm.next();
-}, 16);
+function startAnimation()
+{
+  intervalId = setInterval(function(){
+    if(mouseX&&mouseY)
+      swarm.targetPosition = new Vector(mouseX, mouseY)
 
-document.getElementById('stop').addEventListener('click',function(){
-  clearInterval(intervalId);
+    swarm.next();
+  }, 16);
+}
+
+startAnimation();
+
+
+// PAUSE/SHUFFLE BUTTONS
+var pauseButton = document.getElementById('stop');
+
+pauseButton.addEventListener('click',function(){
+  if(pauseAnimation = !pauseAnimation){
+    clearInterval(intervalId);
+    pauseButton.innerHTML = 'Resume';
+  }
+  else{
+    startAnimation();
+    drawNextFrame();
+    pauseButton.innerHTML = 'Pause';
+  }
 });
 
-// MANAGE MOUSE MOVEMENTS AND CLICKS
+document.getElementById('shuffle').addEventListener('click',function(){
+  var particle, i=0;
+
+  while(particle = swarm.particles[i++]){
+    particle.position.x = Math.random()*containerRect.width;
+    particle.position.y = Math.random()*containerRect.height;
+  }
+
+  mouseX = containerRect.width / 2;
+  mouseY = containerRect.height / 2;
+
+  pauseAnimation&&
+    drawNextFrame();
+});
+
+
+// MANAGE TOUCH AND MOUSE EVENTS
 var mouseX=0,mouseY=0;
 
-container.addEventListener('mousemove',function(e){
+function touchStart(e)
+{
   e.preventDefault();
-  mouseX = e.pageX;
-  mouseY = e.pageY;
-});
-
-container.addEventListener('mousedown',function(e){
-  e.preventDefault();
+  mouseX = e.clientX || (e.touches&&e.touches[0].clientX) || 0;
+  mouseY = e.clientY || (e.touches&&e.touches[0].clientY) || 0;
   swarm.particleBraking = 0.99;
-});
+}
 
-container.addEventListener('mouseup',function(e){
+container.addEventListener('mousedown',touchStart);
+container.addEventListener('touchstart',touchStart);
+
+function touchMove(e)
+{
+  e.preventDefault();
+  mouseX = e.clientX || (e.touches&&e.touches[0].clientX) || 0;
+  mouseY = e.clientY || (e.touches&&e.touches[0].clientY) || 0;
+}
+
+container.addEventListener('mousemove',touchMove);
+container.addEventListener('touchmove',touchMove);
+
+function touchEnd(e)
+{
   e.preventDefault();
   swarm.particleBraking = 0.997;
-  swarm.explode(20);
-});
+  swarm.explode(20, 400);
+}
 
-container.addEventListener('touchmove',function(e){
-  e.preventDefault();
-  mouseX = e.touches[0].clientX;
-  mouseY = e.touches[0].clientY;
-});
-
-container.addEventListener('touchstart',function(e){
-  e.preventDefault();
-  mouseX = e.touches[0].clientX;
-  mouseY = e.touches[0].clientY;
-  swarm.particleBraking = 0.99;
-});
-
-container.addEventListener('touchend',function(e){
-  e.preventDefault();
-  swarm.particleBraking = 0.997;
-  swarm.explode(20);
-});
+container.addEventListener('mouseup',touchEnd);
+container.addEventListener('touchend',touchEnd);
 
 // COUNT FPS
 var fps = 0;
@@ -161,16 +197,24 @@ setInterval(function(){
   fps = 0;
 }, 1000);
 
-function catchNextFrame()
-{
-  requestAnimationFrame(function(){
-    fps++;
 
-    catchNextFrame();
-  });
-}
+// PARTICLES NUMBER
+document.getElementById('count').addEventListener('change', function(e){
+  var countDiff = swarm.particles.length - e.target.valueAsNumber;
+  var absCountDiff = Math.abs(countDiff);
 
-catchNextFrame();
+  if(countDiff === absCountDiff){
+    while(absCountDiff--){
+      swarm.particles.pop();
+      var el = elements.pop(el);
+      container.removeChild(el);
+    }
+  }
+  else{
+    while(absCountDiff--)
+      addParticle();
+  }
+});
 
 </script>
 

@@ -22,6 +22,30 @@ function newVectorLength(a, length)
   return newVector;
 }
 
+function angle(a,b)
+{
+  var v1=0, va=0, vb=0;
+
+  for(var n in a){
+    v1 += a[n] * b[n];
+
+    va += Math.pow(a[n], 2);
+    vb += Math.pow(b[n], 2);
+  }
+
+  return Math.acos(v1 / (Math.sqrt(va) * Math.sqrt(vb)));
+}
+
+function absAngle(a)
+{
+  var acos = angle(new Vector(1,0), a);
+
+  if(a.y<0)
+    acos=acos*-1;
+
+  return acos;
+}
+
 function distance(a,b)
 {
   var distance=0;
@@ -113,12 +137,16 @@ function Particle(initPosition)
       }
     }
 
-    if(this.maxSpeed && distance(new Vector, velocity)>50)
-      velocity = newVectorLength(velocity, 50);
+    if(this.maxSpeed && distance(new Vector, velocity)>this.maxSpeed)
+      velocity = newVectorLength(velocity, this.maxSpeed);
+
+    this.angle = absAngle(velocity);
   }
 
-  this.moveAway = function(from, distance){
-    velocity = newVectorLength(finalVector(this.position,from), distance);
+  this.accelerateFrom = function(from, veloc, radius){
+    veloc = veloc * (1-(Math.min(distance(from, this.position),radius)/radius));
+    if(veloc > 0)
+      velocity = newVectorLength(finalVector(this.position,from), veloc);
   }
 }
 
@@ -140,11 +168,11 @@ function Swarm()
     this.particles.push(particle);
   }
 
-  this.explode=function(distance){
+  this.explode=function(distance, radius){
     var particle, i=0;
 
     while(particle = this.particles[i++])
-      particle.moveAway(this.targetPosition, distance);
+      particle.accelerateFrom(this.targetPosition, distance, radius);
   }
 
   this.next=function(){
