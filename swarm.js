@@ -1,5 +1,12 @@
-'use strict';
+/** Particle swarm optimization method.
+ *  Copyright (C) 2016 Eugene Tiurin (yevhentiurin@gmail.com)
+ *  https://github.com/ytiurin/particleswarm
+ *
+ *  Released under the MIT license
+ *  https://github.com/ytiurin/particleswarm/blob/master/LICENSE
+ */
 
+'use strict';
 
 function finalVector(a,b)
 {
