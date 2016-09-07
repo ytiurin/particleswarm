@@ -1,2 +1,0 @@
-# particleswarm
-Particle swarm optimization
