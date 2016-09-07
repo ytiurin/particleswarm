@@ -7,7 +7,7 @@ Particle swarm optimization method, animated in DOM w/GPU acceleration.
 [Demo page](https://ytiurin.github.io/particleswarm/) is mobile friendly.
 
 ## Usage
-This code defines a configured particle swarm object, adding 10 particles with random position. 
+This code defines a particle swarm object, containing 10 particles with random position. 
 
 ```javascript
 var swarm = new Swarm;
@@ -29,6 +29,12 @@ while(particlesCount--)
       )
     )
   );
+  
+// iterate calculation of particles positions for 60 times per second
+setInterval(function(){
+
+  swarm.next()
+}, 16);
 ```
 
 ## Definition
