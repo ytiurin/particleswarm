@@ -4,7 +4,7 @@
 
 Particle swarm optimization method, animated in DOM w/GPU acceleration.
 
-[Demo page](https://ytiurin.github.io/particleswarm/) is mobile friendly.
+[Codepen example](https://codepen.io/ytiurin/pen/ALWEzV?editors=1010#0) is mobile friendly.
 
 ## Definition
 Particle swarm is an optimization method that iteratively improves a candidate solution with regard to a given measure of quality. Check the Wikipedia [page](https://en.wikipedia.org/wiki/Particle_swarm_optimization) for algorithm description.
