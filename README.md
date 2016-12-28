@@ -8,29 +8,24 @@ Particle swarm is an optimization method that iteratively improves a candidate s
 This code defines a particle swarm object, containing 10 particles with random position. 
 
 ```javascript
+// Create swarm
 var swarm = new Swarm;
-
+// Configure particles movement
 swarm.particleBraking = 0.997;
 swarm.maxSpeed = 50;
-
-swarm.targetPosition = new Vector(100/2, 100/2);
-swarm.boundingRect = [new Vector, new Vector(100, 100)];
-
+// Set swarm target and bound 
+// particles allowed position
+swarm.targetPosition = new Vector( 100 / 2, 100 / 2 );
+swarm.boundingRect = [ new Vector, new Vector( 100, 100 ) ];
+// Set number of particles
 var particlesCount = 10;
-
-while(particlesCount--)
+// Create particles
+while ( particlesCount-- )
   swarm.addParticle(
     new Particle(
-      new Vector(
-        Math.random()*100,
-        Math.random()*100
-      )
-    )
-  );
-  
-// iterate calculation of particles positions for 60 times per second
+      new Vector( Math.random() * 100, Math.random() * 100 )));
+// move particles 60 times per second
 setInterval(function(){
-
   swarm.next()
 }, 16);
 ```
